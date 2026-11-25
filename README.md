@@ -1,5 +1,7 @@
 # Neeraj Rajiv Shivam — Portfolio
 
+**Live site: [neeraj1437.github.io/R-sum-](https://neeraj1437.github.io/R-sum-/)**
+
 Personal portfolio site: LLM systems end to end (LoRA fine-tuning and evals, agents, Python backends), computer vision and edge AI.
 
 Plain HTML, CSS and JavaScript with no build step, so it can be served directly by GitHub Pages.
