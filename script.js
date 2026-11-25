@@ -407,4 +407,18 @@
 
   /* ---------- footer year ---------- */
   $('#year').textContent = new Date().getFullYear();
+
+  /* ---------- text fades out just above the rooftop ----------
+     The rooftop strip (the girl, kiosks, cats) is drawn over the page, so the page's text fades out before it gets
+     there. --fade-at is where the fade ends, measured from the top of each element (style.css applies the mask). */
+  var faded = [].slice.call(document.querySelectorAll('main, .footer')), fadeQueued = false;
+  function setFade() {
+    fadeQueued = false;
+    var end = innerHeight - 80;
+    faded.forEach(function (el) { el.style.setProperty('--fade-at', Math.round(end - el.getBoundingClientRect().top) + 'px'); });
+  }
+  function queueFade() { if (!fadeQueued) { fadeQueued = true; requestAnimationFrame(setFade); } }
+  addEventListener('scroll', queueFade, { passive: true });
+  addEventListener('resize', queueFade);
+  setFade();
 })();

@@ -214,9 +214,9 @@
     day: { // dusk: a violet city with lavender windows and pink neon
       sky: ['#3b2d93', '#4839a8', '#5343b5', '#7150bd'], stars: 0.45, moon: ['#f7f0ff', '#d6c8f2'],
       cloud: '#c4b0ff', cloudA: 0.17,
-      far: '#453392', farHi: '#54409f', farWin: ['#6d54bd', '#7b5dc6', '#6249b2'], farWinP: 0.42, haze: '#8f5ccc', tower: '#4d3a9e',
-      mid: '#3a2572', midHi: '#4b3389', midDark: '#2b1a58', midOff: '#311f63', midWin: ['#9d60d4', '#b67ce2', '#8b56c9'], midWinP: 0.46,
-      near: '#27164b', nearHi: '#3a2468', nearDark: '#1b0f36', edge: '#4f358c', nearOff: '#21133f', nearWin: ['#b571e3', '#cf92f2', '#a064d8'], nearWinP: 0.5,
+      far: '#453392', farHi: '#54409f', farWin: ['#6d54bd', '#7b5dc6', '#6249b2'], farWinP: 0.22, haze: '#8f5ccc', tower: '#4d3a9e',
+      mid: '#3a2572', midHi: '#4b3389', midDark: '#2b1a58', midOff: '#311f63', midWin: ['#9d60d4', '#b67ce2', '#8b56c9'], midWinP: 0.26,
+      near: '#27164b', nearHi: '#3a2468', nearDark: '#1b0f36', edge: '#4f358c', nearOff: '#21133f', nearWin: ['#b571e3', '#cf92f2', '#a064d8'], nearWinP: 0.3,
       crt: '#9484c6', screen: '#6a4fd8', screenHi: '#a68cf6', streak: '#ffb0e8', glow: 0.16,
       box: '#4a3a7e', boxHi: '#5f4d96', plant: ['#2f7a62', '#4fa982', '#7fd1a6'], water: '#7d8cf0', waterHi: '#b4c0ff', train: '#3b2775', trainHi: '#5b42a0',
       floor: '#45387e', floorHi: '#5d4e9a', floorDark: '#322865', face: '#22174a', faceDark: '#170f33', mote: '#ffffff'
@@ -224,9 +224,9 @@
     night: {
       sky: ['#0b0824', '#150f3a', '#221756', '#38206e'], stars: 1, moon: ['#fff6dc', '#d8cfae'],
       cloud: '#9a7cf0', cloudA: 0.11,
-      far: '#211750', farHi: '#2b1f60', farWin: ['#4d3896', '#5b41a6', '#44318c'], farWinP: 0.34, haze: '#5b3596', tower: '#281c5e',
-      mid: '#1b1140', midHi: '#281a56', midDark: '#120a2e', midOff: '#170e37', midWin: ['#a868e6', '#c98af2', '#9056d6'], midWinP: 0.4,
-      near: '#120a29', nearHi: '#1f1440', nearDark: '#0a0519', edge: '#34226a', nearOff: '#0f0823', nearWin: ['#cf86f4', '#e8a6f9', '#b06cea'], nearWinP: 0.45,
+      far: '#211750', farHi: '#2b1f60', farWin: ['#4d3896', '#5b41a6', '#44318c'], farWinP: 0.2, haze: '#5b3596', tower: '#281c5e',
+      mid: '#1b1140', midHi: '#281a56', midDark: '#120a2e', midOff: '#170e37', midWin: ['#a868e6', '#c98af2', '#9056d6'], midWinP: 0.24,
+      near: '#120a29', nearHi: '#1f1440', nearDark: '#0a0519', edge: '#34226a', nearOff: '#0f0823', nearWin: ['#cf86f4', '#e8a6f9', '#b06cea'], nearWinP: 0.28,
       crt: '#55497e', screen: '#5038c4', screenHi: '#7e66ea', streak: '#ff9ccc', glow: 0.24,
       box: '#2b2150', boxHi: '#3a2d66', plant: ['#174a3c', '#287058', '#3f9876'], water: '#4f5fd0', waterHi: '#8794f2', train: '#22164a', trainHi: '#3a2970',
       floor: '#45387e', floorHi: '#5d4e9a', floorDark: '#322865', face: '#22174a', faceDark: '#170f33', mote: '#ff9ccc'
@@ -458,8 +458,8 @@
       var w = Math.min(TILE - 2 - x, 22 + Math.floor(r() * 40)), h = Math.floor(50 + Math.pow(r(), 1.2) * maxH), top = yb - h;
       block(L, x, top, w, yb, rng(500 + x), T, false);
       var sr = r();
-      if (sr < 0.2 && w >= 20) signs.push(['h', x, top, w, flat[fi++ % flat.length]]);
-      else if (sr < 0.4 && h > 80) signs.push(['v', x, top, w, tall[ti++ % tall.length], r() < 0.4]);
+      if (sr < 0.07 && w >= 20) signs.push(['h', x, top, w, flat[fi++ % flat.length]]);           // signs kept sparse, so the
+      else if (sr < 0.13 && h > 80) signs.push(['v', x, top, w, tall[ti++ % tall.length], r() < 0.4]);   // text stays the focus
       tops.push([x, top, w]);
       x += w + (r() < 0.55 ? 0 : 2 + Math.floor(r() * 8));
     }
@@ -503,18 +503,15 @@
   function genNear() {
     var L = layer(), ctx = L.ctx, r = rng(37), fb = floorB(), x, i;
     var T = { body: P.near, hi: P.nearHi, dark: P.nearDark, off: P.nearOff, wins: P.nearWin, p: P.nearWinP };
-    // a few tall buildings close by, with big signs; nothing tall near the start, where the desk is
+    // a few tall buildings close by (one with a BANK board); nothing tall near the start, where the desk is
     var spots = [[296, 64, 'BAR', 1], [520, 80, 'INN', 2], [770, 58, 'ATM', 0]];
     spots.forEach(function (s, k) {
       var bx0 = s[0] + Math.floor(r() * 30), w = s[1] + Math.floor(r() * 14), h = Math.floor(HB * (0.5 + r() * 0.28)), top = fb - h;
       block(L, bx0, top, w, fb, rng(900 + bx0), T, true);
-      var col = SIGN[k % SIGN.length];
-      if (s[3] === 1) signV(L, bx0 + w - 3, top + 18, s[2], col, true, -1);
-      else if (s[3] === 2) {
-        signV(L, bx0 - 9, top + 26, s[2], col, false, 1);
+      if (s[3] === 2) {
         signH(L, bx0 + Math.floor((w - 29) / 2), top - 22, 'BANK', SIGN[1], 8, P.nearDark);
         fan(L, bx0 + w - 13, top + Math.floor(h * 0.45), 9, mix(P.edge, '#ffffff', 0.22), P.edge);
-      } else signV(L, bx0 - 9, top + Math.floor(h * 0.35), s[2], col, false, 1);
+      }
     });
     // the back of the rooftop: a low wall with a railing, the city beyond
     var wt = fb - 12;
@@ -821,6 +818,18 @@
     drawLayer(near, PAR.near);
     drawHome();
     drawMotes();
+    drawVeil();
+  }
+  function drawVeil() { // darkens the city behind the page's text column (about 1060 CSS px), fading out to the sides and the rooftop
+    var col = Math.min(WB, Math.round(1060 / S)), edge = Math.round(140 / S), x0 = Math.round((WB - col) / 2), fb = floorB();
+    var a = night ? 0.42 : 0.36, c = night ? '10,6,30' : '24,14,64', k = edge / (col + 2 * edge);
+    var g = bx.createLinearGradient(x0 - edge, 0, x0 + col + edge, 0);
+    g.addColorStop(0, 'rgba(' + c + ',0)'); g.addColorStop(k, 'rgba(' + c + ',' + a + ')');
+    g.addColorStop(1 - k, 'rgba(' + c + ',' + a + ')'); g.addColorStop(1, 'rgba(' + c + ',0)');
+    bx.fillStyle = g;
+    bx.fillRect(0, 0, WB, fb - 60);
+    for (var y = 0; y < 60; y += 4) { bx.globalAlpha = 1 - y / 60; bx.fillRect(0, fb - 60 + y, WB, 4); }
+    bx.globalAlpha = 1;
   }
 
   /* ---------- foreground ---------- */
@@ -859,6 +868,7 @@
         continue;
       }
       var r = hash(k * 13 + 5);
+      if (hash(k * 29 + 3) < 0.5) continue;           // every other slot left bare, so the rooftop stays calm
       if (r < 0.1) {                                   // traffic cone
         rect(fx, x - 1, gy - 1, 9, 2, OUTLINE); rect(fx, x, gy - 1, 7, 1, '#2e2648');
         for (var c = 0; c < 9; c++) { var hw = Math.floor(c / 3); rect(fx, x + 3 - hw - 1, gy - 10 + c, hw * 2 + 3, 1, c === 4 || c === 5 ? '#f2f2f7' : '#ff7a4a'); }
@@ -938,7 +948,7 @@
         var set = CATS[hash(k * 3) < 0.6 ? 0 : 1], blink = mod(t + ph, 4) < 0.15 || pettedCat() === k;
         img = (blink ? set.blink : set.front)[catFlip(k)];
         fx.drawImage(img, Math.round(base), gy - img.height + 1);
-      } else if (r < 0.6) {                                // a patrol robot going back and forth
+      } else if (r < 0.46) {                               // a patrol robot going back and forth
         var a = t * 0.5 + ph, bxp = base + Math.sin(a) * 26, dir = Math.cos(a) >= 0 ? 0 : 1;
         img = BOT[dir];
         var bob = Math.floor(t * 8) % 2;
@@ -946,11 +956,6 @@
         var vx = Math.round(bxp) + 2 + Math.floor(mod(t * 4 + ph, 1) * 7);
         dot(fx, vx, gy - img.height + 5, '#5ee6ff');
         if ((t + ph) % 1 < 0.5) dot(fx, Math.round(bxp) + 5, gy - img.height + 1, '#ff5a6a');
-      } else if (r < 0.74) {                               // a drone hovering low
-        img = DRONE[Math.floor(t * 14 + k) % 2];
-        var dy = gy - 34 + Math.round(Math.sin(t * 2 + ph) * 3);
-        fx.drawImage(img, Math.round(base + Math.sin(t * 0.4 + ph) * 16), dy);
-        rect(fx, Math.round(base + Math.sin(t * 0.4 + ph) * 16) + 3, gy - 1, 5, 1, 'rgba(10,14,30,.35)');
       }
     }
   }

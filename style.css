@@ -171,6 +171,12 @@ kbd {
   image-rendering: pixelated; image-rendering: crisp-edges;
 }
 main, .footer { position: relative; z-index: 1; }
+/* the text fades out just above the rooftop strip, so the girl and the props never sit on top of it
+   (script.js keeps --fade-at at that line as you scroll; without it nothing fades) */
+main, .footer {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(var(--fade-at, 100000px) - 110px), transparent var(--fade-at, 100000px));
+  mask-image: linear-gradient(to bottom, #000 calc(var(--fade-at, 100000px) - 110px), transparent var(--fade-at, 100000px));
+}
 
 .bubble {
   position: fixed; z-index: 31; left: 0; bottom: 0;
@@ -626,7 +632,7 @@ main { counter-reset: stop; }
 .letter__note { font-size: .9rem; text-align: center; color: var(--ink-3) !important; }
 
 /* ---------- footer ---------- */
-.footer { padding: 3rem 0 2rem; text-align: center; color: var(--title); text-shadow: 2px 2px 0 var(--title-shadow); font-weight: 600; }
+.footer { padding: 3rem 0 calc(2rem + 130px); text-align: center; color: var(--title); text-shadow: 2px 2px 0 var(--title-shadow); font-weight: 600; }
 .footer__thanks { font-family: var(--font-head); font-weight: 700; font-size: clamp(1.5rem, 4vw, 2rem); margin-bottom: .6rem; text-shadow: 3px 3px 0 var(--pink-dark), 0 0 18px var(--glow); }
 .footer__keys { margin-top: .8rem; }
 .footer kbd { text-shadow: none; }
