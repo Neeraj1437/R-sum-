@@ -293,11 +293,6 @@ main, .footer { position: relative; z-index: 1; }
   display: flex; align-items: center;
   padding: calc(var(--hud-h) + 2.5rem) 0 calc(var(--ground) + 7rem);
 }
-.hero__kicker {
-  font-family: var(--font-mono); font-weight: 700; font-size: .95rem; letter-spacing: .12em; text-transform: uppercase;
-  color: var(--cyan); text-shadow: 2px 2px 0 var(--title-shadow), 0 0 12px rgba(94, 230, 255, .45);
-  margin-bottom: .6rem;
-}
 .hero__title {
   font-size: clamp(2.6rem, 8vw, 5.2rem);
   line-height: 1.02;
@@ -422,11 +417,11 @@ main { counter-reset: stop; }
   box-shadow: 0 0 0 2px var(--line), 0 0 0 4px var(--metal-hi), 0 0 0 6px var(--line);
 }
 .avatar {
-  --s: 1; --ax: -117; --ay: 0;                            /* the front view until avatar.js takes over */
+  --s: 1; --ax: -123; --ay: -44;                          /* the front view until avatar.js takes over */
   display: block;
-  width: calc(39px * var(--s)); height: calc(43px * var(--s));
+  width: calc(41px * var(--s)); height: calc(44px * var(--s));
   background: url(images/avatar.png) no-repeat;
-  background-size: calc(273px * var(--s)) calc(258px * var(--s));
+  background-size: calc(287px * var(--s)) calc(352px * var(--s));
   background-position: calc(var(--ax) * var(--s) * 1px) calc(var(--ay) * var(--s) * 1px);
   image-rendering: crisp-edges; image-rendering: pixelated;
 }

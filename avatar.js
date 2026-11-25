@@ -1,8 +1,9 @@
 /* =========================================================
    The player portrait: a pixel avatar of Neeraj in the top bar and on the About player card.
-   Frames live in images/avatar.png (traced from a portrait sheet: 39 x 43 px each, 7 to a row). Both
-   portraits ([data-avatar]) always show the same frame.
-   He looks towards the pointer (twelve head directions), blinks, says the hero line when the page opens,
+   Frames live in images/avatar.png (41 x 44 px each, 7 to a row): 21 head angles traced from a look-around
+   sheet (seven turns from far left to far right, each looking up, level and down) with a blink for each,
+   two talking mouths, and ten expression faces from a matching expressions sheet. Both portraits ([data-avatar]) always show the same frame.
+   He looks towards the pointer (the nearest of the 21 angles), blinks, says the hero line when the page opens,
    looks bored if left alone, looks away while the tab is hidden, and pulls faces when things happen on
    the page (script.js calls Avatar.show).
    Exposes window.Avatar = { show(name, ms), talk(ms), clear() }.
@@ -10,12 +11,16 @@
 (function () {
   'use strict';
 
-  var ORDER = ['farLeft', 'left', 'slightLeft', 'front', 'slightRight', 'right', 'up', 'down', 'upLeft', 'upRight',
-    'downLeft', 'downRight', 'farLeftBlink', 'leftBlink', 'slightLeftBlink', 'frontBlink', 'slightRightBlink',
-    'rightBlink', 'upBlink', 'downBlink', 'upLeftBlink', 'upRightBlink', 'downLeftBlink', 'downRightBlink',
-    'talkA', 'talkB', 'laughing', 'happy', 'bored', 'thinking', 'annoyed', 'sad', 'confused', 'nervous',
-    'winking', 'grinning', 'lookBack'];
-  var COLS = 7, CW = 39, CH = 43;
+  var YAW = ['farLeft', 'left', 'slightLeft', 'front', 'slightRight', 'right', 'farRight'];   // viewer's left to right
+  function look(pitch, yaw) { // 'up' / '' / 'down' + a turn -> frame name: 'upFarLeft', 'left', 'down', ...
+    if (!pitch) return yaw;
+    return yaw === 'front' ? pitch : pitch + yaw.charAt(0).toUpperCase() + yaw.slice(1);
+  }
+  var LOOKS = [];
+  ['up', '', 'down'].forEach(function (p) { YAW.forEach(function (y) { LOOKS.push(look(p, y)); }); });
+  var ORDER = LOOKS.concat(LOOKS.map(function (n) { return n + 'Blink'; }), ['talkA', 'talkB', 'happy', 'laughing', 'winking',
+    'grinning', 'thinking', 'bored', 'annoyed', 'sad', 'confused', 'nervous']);
+  var COLS = 7, CW = 41, CH = 44;
 
   var els = [].slice.call(document.querySelectorAll('[data-avatar]'));
   if (!els.length) return;
@@ -60,31 +65,30 @@
     }
     return els[0].getBoundingClientRect();
   }
-  function aim(dx, dy, cx) {
-    var ax = Math.abs(dx), ay = Math.abs(dy);
-    if (Math.hypot(dx, dy) < 40) return 'front';                 // the pointer is on his face
-    if (ay > 60 && ay > ax * 1.6) return dy < 0 ? 'up' : 'down';
-    if (ay > 60 && ay > ax * 0.45) return (dy < 0 ? 'up' : 'down') + (dx < 0 ? 'Left' : 'Right');
-    var nx = dx / Math.max(160, dx < 0 ? cx : innerWidth - cx);  // 1 = the edge of the screen on that side
-    if (nx < -0.6) return 'farLeft';
-    if (nx < -0.25) return 'left';
-    if (nx < -0.05) return 'slightLeft';
-    if (nx <= 0.05) return 'front';
-    if (nx <= 0.3) return 'slightRight';
-    return 'right';                                              // the sheet has no far-right view
+  // dx, dy: the pointer from his eyes; cx, cy: his eyes on screen. Each axis is measured against the room on that
+  // side of him (1 = the edge of the screen), so he can look all the way round from either portrait.
+  function aim(dx, dy, cx, cy) {
+    if (Math.hypot(dx, dy) < 30) return 'front';                // the pointer is on his face
+    var nx = dx / Math.max(160, dx < 0 ? cx : innerWidth - cx);
+    var ny = dy / Math.max(120, dy < 0 ? cy : innerHeight - cy);
+    var yaw = nx < -0.62 ? 'farLeft' : nx < -0.3 ? 'left' : nx < -0.08 ? 'slightLeft' : nx <= 0.08 ? 'front'
+      : nx <= 0.3 ? 'slightRight' : nx <= 0.62 ? 'right' : 'farRight';
+    var pitch = ny < -0.2 ? 'up' : ny > 0.2 ? 'down' : '';
+    return look(pitch, yaw);
   }
   document.addEventListener('pointermove', function (e) {
     wake();
     if (e.pointerType !== 'mouse' || reduce) return;
     mouseAt = now();
     var r = ref();
-    var cx = r.left + r.width / 2;
-    var a = aim(e.clientX - cx, e.clientY - (r.top + r.height * 0.45), cx);
+    var cx = r.left + r.width / 2, cy = r.top + r.height * 0.45;
+    var a = aim(e.clientX - cx, e.clientY - cy, cx, cy);
     if (a !== want) { want = a; wantSince = now(); }
   }, { passive: true });
 
   // no mouse (touch, or it has been still a while): he glances about on his own, mostly at you
-  var GLANCES = ['front', 'front', 'front', 'slightLeft', 'slightRight', 'slightLeft', 'slightRight', 'left', 'right', 'up', 'down', 'upLeft', 'upRight'];
+  var GLANCES = ['front', 'front', 'front', 'slightLeft', 'slightRight', 'slightLeft', 'slightRight', 'left', 'right', 'up', 'down',
+    'upSlightLeft', 'upSlightRight', 'downSlightLeft', 'downSlightRight', 'farLeft', 'farRight'];
   function wander(t) {
     if (t < nextWander) return;
     want = GLANCES[Math.floor(Math.random() * GLANCES.length)]; wantSince = t - 1000;
@@ -95,7 +99,7 @@
   function wake() { active = now(); bored = false; }
   ['scroll', 'keydown', 'pointerdown', 'touchstart'].forEach(function (ev) { addEventListener(ev, wake, { passive: true }); });
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) { away = true; draw('lookBack'); }
+    if (document.hidden) { away = true; draw('farLeft'); }
     else if (away) { away = false; active = now(); show('happy', 1400); }   // glad you're back
   });
   document.addEventListener('mouseout', function (e) { // the pointer leaves the window: a sad little face until it's back
@@ -126,7 +130,7 @@
 
   /* ---------- the loop ---------- */
   function frame(t) {
-    if (away) return 'lookBack';
+    if (away) return 'farLeft';                            // looking away while you're on another tab
     if (expr && t < expr.until) return expr.name;
     expr = null;
     if (t < talkUntil) {                                     // the mouth flaps: shut, a little open, open

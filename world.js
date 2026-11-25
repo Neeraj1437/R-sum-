@@ -154,11 +154,9 @@
     girlTop = G.poses.front.rows.length + 2;
   }
 
-  /* Cats sitting around the rooftop (facing you, blinking), black or orange, and an orange one asleep on the
-     monitor at the desk. The dark outline is part of the art. */
+  /* Cats sitting around the rooftop (facing you, blinking), black or orange. The dark outline is part of the art. */
   var BLACK_CAT = { k: '#0c0a14', y: '#2b283f', Y: '#1f1c30', c: '#3b3758', e: '#9dff8a', n: '#ff8fb5', p: '#3b3758' };
   var ORANGE_CAT = { k: '#2a140e', y: '#f08a35', Y: '#c25e1c', c: '#ffe0b8', e: '#5ee6ff', n: '#ff7fa8', p: '#ffe0b8' };
-  var CAT_PAL = { k: '#2a140e', y: '#f08a35', Y: '#c25e1c', c: '#ffe0b8', e: '#2a140e', n: '#ff7fa8', p: '#ffe0b8' };   // asleep: eyes shut
   var CAT_FRONT = [
     '.k.......k.....',
     'kyk.....kyk....',
@@ -183,18 +181,8 @@
   var CAT_BLINK = CAT_FRONT.slice();
   CAT_BLINK[6] = 'kyyyyyyyyyk....';
   CAT_BLINK[7] = 'kykycccykyk....';
-  var CAT_SLEEP = [               // curled up asleep (on the monitor at the desk)
-    '..k.k............',
-    '.kykyk...........',
-    'kyyyyyykkkkkk....',
-    'kyekyyyyyYyYykk..',
-    'kyyyyyYyYyyyyyyk.',
-    '.kccyyyyyyyyyyyyk',
-    '..kkkkkkkkkkkkkk.'
-  ];
   function catSet(pal) { return { front: pair(CAT_FRONT, pal, null), blink: pair(CAT_BLINK, pal, null) }; }
   var CATS = [catSet(BLACK_CAT), catSet(ORANGE_CAT)];
-  var SLEEPY = sprite(CAT_SLEEP, CAT_PAL, null);
 
   // a little patrol robot and a hovering drone
   var BOT_PAL = { k: '#16112e', w: '#c4b8e8', g: '#7a6cb0', v: '#2e2266', a: '#ff5a6a', O: '#2f2652' };
@@ -267,7 +255,7 @@
   function FLOOR() { return gyF() + 3; }                                     // where feet stand
 
   /* ---------- backdrop: pre-rendered tiles ---------- */
-  function layer() { var c = canvas(TILE, HB); return { c: c, ctx: c.getContext('2d'), screens: [], leds: [], beacons: [], neons: [], lamps: [], fans: [] }; }
+  function layer() { var c = canvas(TILE, HB); return { c: c, ctx: c.getContext('2d'), screens: [], leds: [], beacons: [], neons: [], lamps: [], fans: [], vends: [] }; }
 
   function genSky() {
     var c = canvas(WB, HB), ctx = c.getContext('2d'), n = 26, i, x, cols = [];
@@ -575,6 +563,7 @@
   }
   function vending(L, x, fb, r) {
     var ctx = L.ctx, w = 24, h = 48, y0 = fb - h, i, j;
+    L.vends.push(x);                       // she can walk over for a drink
     rect(ctx, x - 3, y0 - 3, w + 6, h + 3, rgba('#e6d8ff', P.glow));
     rect(ctx, x - 1, y0 - 1, w + 2, h + 1, OUTLINE);
     rect(ctx, x, y0, w, h, '#9b8ad6'); rect(ctx, x + w - 3, y0, 3, h, '#7a68b8');
@@ -771,7 +760,7 @@
     rect(bx, nose, ty + 2, 2, 5, '#fff6d0');
     rect(bx, train.dir > 0 ? nose + 2 : nose - 14, ty + 3, 14, 3, 'rgba(255,246,208,.15)');
   }
-  function drawHome() { // the cosy desk where the walk starts: fish tank, terminal, an orange cat asleep on the monitor
+  function drawHome() { // the cosy desk where the walk starts: fish tank, terminal, and a counter
     var x = home() - 150 - Math.round(cxB * PAR.near), fb = floorB(), i;
     if (x < -130 || x > WB + 10) return;
     // fish tank on a cabinet
@@ -806,11 +795,6 @@
     var scroll = Math.floor(t * 1.4);
     for (i = 0; i < 4; i++) rect(bx, cx0 + 4, cy0 + 4 + i * 3, 3 + Math.floor(hash(i + scroll) * 14), 1, i === 3 && t % 1 < 0.5 ? '#0b1f1a' : '#7cf0a8');
     rect(bx, cx0 + 8, top - 1, 11, 1, P.nearDark);
-    bx.drawImage(SLEEPY, cx0 + 4, cy0 - 7 + (Math.floor(t * 0.8) % 2));                               // the cat breathes
-    if (mod(t, 3) < 1.6) { // a little "z" drifting up from the sleeping cat
-      var zp = mod(t, 3) / 1.6, zx = cx0 + 16 + zp * 6, zy = cy0 - 10 - zp * 10, zc = 'rgba(255,255,255,' + (1 - zp).toFixed(2) + ')';
-      rect(bx, zx, zy, 3, 1, zc); dot(bx, zx + 1, zy + 1, zc); rect(bx, zx, zy + 2, 3, 1, zc);
-    }
     rect(bx, dx + 34, top - 2, 16, 2, '#6a5aa0'); rect(bx, dx + 34, top - 2, 16, 1, '#8d7dc4');
     rect(bx, dx + 36, top - 12, 21, 9, OUTLINE); rect(bx, dx + 37, top - 11, 19, 7, '#170c14');
     var n = ('0000' + found).slice(-4);
@@ -922,18 +906,37 @@
       } else {
         if (t % 1 < 0.6) rect(fx, x - 6, gy - 22, 3, 1, '#5ee6ff');
         rect(fx, x - 6, gy - 29, 7, 1, '#3d2f7a'); rect(fx, x - 6, gy - 27, 10, 1, '#3d2f7a'); rect(fx, x - 6, gy - 25, 5, 1, '#3d2f7a');
+        if (girl.mode === 'act' && girl.act.kiosk === i) { // she is typing on it: her lines appear, a letter at a time
+          var typed = Math.max(0, Math.floor((t - girl.since - 0.5) * 8)), LINES = [7, 12, 4, 10];
+          for (var ln = 0; ln < LINES.length && typed > 0; ln++) {
+            rect(fx, x - 6, gy - 30 + ln * 2, Math.min(typed, LINES[ln]), 1, '#5ee6ff'); typed -= LINES[ln];
+          }
+        }
       }
     }
   }
 
+  // the cats: one in roughly every third 170px slot, never in the two slots at the start
+  var CRIT = 170;
+  function isCat(k) { return k !== 0 && k !== -1 && hash(k * 101 + 9) < 0.34; }
+  function critterX(k) { return k * CRIT + 40 + Math.floor(hash(k * 41) * 60); }   // world px, left edge
+  function catFlip(k) { return hash(k * 7) < 0.5 ? 0 : 1; }                          // 1: mirrored, head on the right
+  function catSpots() { // cats on screen: the middle of each one's head, in front px
+    var cx = Math.round(cxF), out = [];
+    for (var k = Math.floor(cx / CRIT) - 1; k <= Math.floor((cx + WF) / CRIT) + 1; k++) {
+      if (isCat(k)) out.push({ x: critterX(k) - cx + (catFlip(k) ? 9 : 5), opt: k });
+    }
+    return out;
+  }
+  function pettedCat() { return girl.mode === 'act' && girl.act.cat !== undefined ? girl.act.cat : null; }
   function drawCritters(cx) {
-    var slot = 170, gy = FLOOR(), k0 = Math.floor(cx / slot) - 1, k1 = Math.floor((cx + WF) / slot) + 1;
+    var slot = CRIT, gy = FLOOR(), k0 = Math.floor(cx / slot) - 1, k1 = Math.floor((cx + WF) / slot) + 1;
     for (var k = k0; k <= k1; k++) {
       if (k === 0 || k === -1) continue; // keep the start clear
-      var r = hash(k * 101 + 9), ph = hash(k * 37) * 6.28, base = k * slot + 40 + Math.floor(hash(k * 41) * 60) - cx, img;
-      if (r < 0.34) {                                      // a cat sitting, blinking
-        var set = CATS[hash(k * 3) < 0.6 ? 0 : 1], blink = mod(t + ph, 4) < 0.15;
-        img = (blink ? set.blink : set.front)[hash(k * 7) < 0.5 ? 0 : 1];
+      var r = hash(k * 101 + 9), ph = hash(k * 37) * 6.28, base = critterX(k) - cx, img;
+      if (r < 0.34) {                                      // a cat sitting, blinking (eyes shut and content while she pets it)
+        var set = CATS[hash(k * 3) < 0.6 ? 0 : 1], blink = mod(t + ph, 4) < 0.15 || pettedCat() === k;
+        img = (blink ? set.blink : set.front)[catFlip(k)];
         fx.drawImage(img, Math.round(base), gy - img.height + 1);
       } else if (r < 0.6) {                                // a patrol robot going back and forth
         var a = t * 0.5 + ph, bxp = base + Math.sin(a) * 26, dir = Math.cos(a) >= 0 ? 0 : 1;
@@ -975,7 +978,8 @@
     var dur = list.reduce(function (s, x) { return s + x[1]; }, 0);
     return {
       dur: dur,
-      at: function (e) { for (var i = 0, acc = 0; i < list.length; i++) { acc += list[i][1]; if (e < acc) return list[i]; } return list[list.length - 1]; }
+      at: function (e) { for (var i = 0, acc = 0; i < list.length; i++) { acc += list[i][1]; if (e < acc) return list[i]; } return list[list.length - 1]; },
+      into: function (e) { for (var i = 0, acc = 0; i < list.length; i++) { if (e < acc + list[i][1]) return e - acc; acc += list[i][1]; } return 0; }
     };
   }
   function breathe(pose, secs, face) { // hold a pose, sinking 1px on each out-breath
@@ -988,6 +992,35 @@
     return [['stretch0', 0.35, d], ['stretch1', 0.4, d], ['stretch2', 0.9, d], ['stretch1', 0.2, d], ['stretch3', 0.3, d],
       ['stretch4', 0.55, d], ['stretch5', 0.4, d]];
   }
+  // things she can walk over to and use (front px on screen): the kiosks, the cats, the vending machines in the back row
+  function kioskSpots() {
+    var cx = Math.round(cxF), out = [];
+    for (var i = 0; i < markers.length; i++) out.push({ x: Math.round(markers[i] * WALK / S + home() + 16 - cx), opt: i });
+    return out;
+  }
+  function vendSpots() { // each machine's buttons; they scroll with the back row of the rooftop
+    var out = [];
+    if (!near) return out;
+    for (var x0 = -mod(Math.round(cxB * PAR.near), TILE); x0 < WB; x0 += TILE) near.vends.forEach(function (v) { out.push({ x: x0 + v + 19, opt: null }); });
+    return out;
+  }
+  function nearest(list) { // the closest one on screen, if it is a short walk away
+    var best = null;
+    list.forEach(function (o) {
+      if (o.x >= 20 && o.x <= WF - 20 && (!best || Math.abs(o.x - girl.x) < Math.abs(best.x - girl.x))) best = o;
+    });
+    return best && Math.abs(best.x - girl.x) < 220 ? best : null;
+  }
+  function standBy(o, reach, prefer) { // where she stands to use it: reach px to one side, facing it (her near side unless told)
+    if (!o) return null;
+    var sides = prefer ? [prefer, -prefer] : girl.x <= o.x ? [1, -1] : [-1, 1];
+    for (var i = 0; i < 2; i++) {
+      var x = o.x - sides[i] * reach;
+      if (x >= 24 && x <= WF - 24) return { x: x, face: sides[i], opt: o.opt };
+    }
+    return null;
+  }
+
   var wishAt = -9;                        // when she last looked up at the sky
   var ACTS = {
     roam: {},                             // weights for roam and dash live in weight()
@@ -1029,6 +1062,51 @@
           [['sit', 0.4, f], ['sitUp', 0.16, f], ['stand3', 0.24, f]], r() < 0.5 ? stretchOut(f) : [], [['three', TURN, f]]));
       a.sit = true; return a;
     } },
+    phone: { w: 9, make: function (d) {   // checks her phone: scrolls, smiles at something, puts it away
+      return hold([['three', TURN, d], ['phone0', 0.3, d], ['phone1', 0.45, d], ['phone2', 1.3 + Math.random(), d], ['phone2Blink', 0.12, d],
+        ['phone2', 0.9, d], ['phone3', 1.3, d], ['phone2', 0.7, d], ['phone4', 0.35, d], ['phone5', 0.45, d], ['three', TURN, d]]);
+    } },
+    photo: { w: 7, make: function (d) {   // a photo of the skyline: lines it up, snap (a flash), looks at it, pleased
+      return hold([['three', TURN, d], ['photo0', 0.45, d], ['photo1', 1.1, d], ['photo2', 0.2, d], ['photo1', 0.35, d], ['photo3', 0.9, d],
+        ['photo3Blink', 0.12, d], ['photo3', 0.6, d], ['photo4', 1.3, d], ['three', TURN, d]]);
+    } },
+    music: { w: 7, make: function (d) {   // headphones on, eyes shut, nodding along to a song, then off again
+      var l = [['three', TURN, d], ['music0', 0.6, d], ['music1', 0.45, d], ['music2', 1.2, d]], n = 6 + Math.floor(Math.random() * 5), i;
+      for (i = 0; i < n; i++) l.push(['music3', 0.26, d], ['music3B', 0.26, d]);
+      l.push(['music4', 1.2, d]);
+      for (i = 0; i < 4; i++) l.push(['music3', 0.26, d], ['music3B', 0.26, d]);
+      return hold(l.concat([['music2', 0.6, d], ['music5', 0.45, d], ['music0', 0.4, d], ['three', TURN, d]]));
+    } },
+    chill: { w: 0, make: function (d) {   // hands in her pockets, a shiver, then easy, breathing out little clouds (weight in weight())
+      var l = [['three', TURN, d], ['chill0', 1.1, d], ['chill1', 0.9, d], ['chill2', 1.2, d], ['chill2Blink', 0.12, d], ['chill2', 0.6, d]];
+      for (var i = 0, n = 2 + Math.floor(Math.random() * 2); i < n; i++) l.push(['chill3', 1.5, d], ['chill2', 1.1, d]);
+      return hold(l.concat([['chill2Blink', 0.12, d], ['chill2', 0.5, d], ['three', TURN, d]]));
+    } },
+    fly: { w: 6, make: function (d) {     // holds up a finger: a holo-butterfly flies in, rests on it, and flutters off
+      var a = hold([['three', TURN, d], ['fly0', 1.8, d], ['fly1', 1, d], ['fly1Blink', 0.12, d], ['fly1', 0.6, d], ['fly2', 1.2, d],
+        ['fly3', 1.4, d], ['fly4', 0.9, d], ['three', TURN, d]]);
+      a.land = TURN + 1.8; a.off = a.land + 2.92;   // when fly1 starts (it lands) and when fly3 starts (it leaves)
+      a.fly = true; return a;
+    } },
+    // the next three walk her over to something first (find: where to stand), and only count when one is close by
+    type: { w: 10, find: function () { return standBy(nearest(kioskSpots()), 14); }, make: function (f, i) {
+      var l = [['three', TURN, f], ['type0', 0.4, f]], r = Math.random;
+      function burst(pose, n) { for (var k = 0; k < n; k++) l.push([pose, 0.1 + r() * 0.1, f], [pose + 'Tap', 0.09 + r() * 0.05, f]); }
+      burst('type1', 6); l.push(['type1', 0.5, f], ['type1Blink', 0.12, f]); burst('type1', 5);
+      l.push(['type2', 0.6, f]); burst('type2', 6);
+      var a = hold(l.concat([['type2', 0.5, f], ['type3', 0.9, f], ['type0', 0.3, f], ['three', TURN, f]]));
+      a.kiosk = i; return a;
+    } },
+    pet: { w: 14, find: function () { return standBy(nearest(catSpots()), 12); }, make: function (f, k) {
+      var l = [['three', TURN, f], ['pet0', 0.35, f], ['pet1', 0.7, f]], n = 3 + Math.floor(Math.random() * 3);
+      for (var i = 0; i < n; i++) l.push(['pet2', 0.4, f], ['pet2Slide', 0.4, f]);
+      var a = hold(l.concat([['pet3', 0.5, f], ['pet4', 1.4, f], ['pet1', 0.4, f], ['pet0', 0.35, f], ['three', TURN, f]]));
+      a.cat = k; return a;
+    } },
+    drink: { w: 10, find: function () { return standBy(nearest(vendSpots()), 20, -1); }, make: function (f) {
+      return hold([['three', TURN, f], ['drink0', 0.5, f], ['drink1', 0.8, f], ['drink2', 0.6, f], ['drink3', 0.45, f], ['drink4', 1.3, f],
+        ['drink5', 0.9, f], ['drink4', 1, f], ['drink5', 1.2, f], ['three', TURN, f]]);
+    } },
     doze: { w: 6, make: function (f) {     // sits down on the floor and nods off (twice), jolts awake, gets up and stretches
       var r = Math.random;
       var a = hold([['three', TURN, f], ['sitDown', 0.18, f], ['doze0', 1 + r() * 0.6, f], ['doze0Blink', 0.12, f], ['doze0', 0.7, f],
@@ -1046,7 +1124,10 @@
     if (name === 'dash') return moved ? 0 : 9;
     if (name === 'sit') { var b = nearestBench(); return lastAct !== 'sit' && b !== null && Math.abs(b - girl.x) < 220 ? 16 : 0; }
     if (name === 'doze' && lastAct === 'sit') return 0;                 // not straight after a sit on the bench
-    return name === lastAct ? 0 : ACTS[name].w;
+    if (name === lastAct) return 0;
+    if (name === 'chill') return night ? 12 : 3;                        // mostly on cold nights
+    if (ACTS[name].find) return ACTS[name].find() ? ACTS[name].w : 0;
+    return ACTS[name].w;
   }
   function startAct(name, face, opt) {
     girl.act = ACTS[name].make(face, opt);
@@ -1073,7 +1154,14 @@
     if (name === 'sit') {                  // walk over to the bench first; she sits when she gets there
       var face = Math.random() < 0.5 ? -1 : 1;
       girl.target = nearestBench() + SIT_DX * face;
-      girl.after = face;
+      girl.after = { name: 'sit', face: face };
+      girl.facing = girl.target >= girl.x ? 1 : -1;
+      girl.fast = false;
+      girl.mode = 'roam';
+    } else if (ACTS[name].find) {          // walk over to it; she starts when she gets there
+      var spot = ACTS[name].find();
+      girl.target = spot.x;
+      girl.after = { name: name, face: spot.face, opt: spot.opt };
       girl.facing = girl.target >= girl.x ? 1 : -1;
       girl.fast = false;
       girl.mode = 'roam';
@@ -1138,7 +1226,7 @@
       var gap = girl.target - girl.x, step = (girl.fast ? DASH_SPEED : WALK_SPEED) * dt;
       if (Math.abs(gap) <= step) {
         girl.x = girl.target; girl.lastMove = t;
-        if (girl.after) { startAct('sit', girl.after); girl.after = 0; }          // at the bench: sit down
+        if (girl.after) { startAct(girl.after.name, girl.after.face, girl.after.opt); girl.after = 0; }   // there: sit down, pet the cat...
         else if (!girl.fast && lastAct !== 'notice' && Math.random() < 0.3) startAct('notice', girl.facing, true);   // stops and turns round to you
         else settleIdle(0.8 + Math.random() * 1.6);
       }
@@ -1173,6 +1261,60 @@
       for (var r = 0; r < z.length; r++) for (var k = 0; k < z[r].length; k++) if (z[r][k] === '#') dot(fx, zx + k, zy + r, c);
     }
   }
+  // little extras for her moments: the camera flash, breath on a cold night, music notes, hearts from the cat, the butterfly.
+  // Her frames face right; facing left mirrors them about her centre, so a pixel dx to the right lands at x + facing * dx.
+  var NOTE = ['.##', '.#.', '##.', '##.'], HEART = ['##.##', '#####', '.###.', '..#..'];
+  var FLY_TIP = { fly0: [15, -41], fly1: [15, -40], fly1Blink: [15, -40], fly2: [14, -39], fly3: [14, -42] };   // her fingertip
+  function glyph(rows, x, y, c) {
+    for (var r = 0; r < rows.length; r++) for (var k = 0; k < rows[r].length; k++) if (rows[r][k] === '#') dot(fx, x + k, y + r, c);
+  }
+  function fade(p) { return p < 0.15 ? p / 0.15 : 1 - (p - 0.15) / 0.85; }
+  function drawBug(x, y, col, open, a) { // a holo-butterfly, like the ones flitting about
+    x = Math.round(x); y = Math.round(y);
+    rect(fx, x - 3, y - 2, 7, 5, rgba(col, 0.15 * a));
+    var c = rgba(col, a);
+    if (open) { rect(fx, x - 2, y - 1, 2, 2, c); rect(fx, x + 1, y - 1, 2, 2, c); dot(fx, x - 1, y + 1, c); dot(fx, x + 1, y + 1, c); }
+    else { rect(fx, x - 1, y - 1, 1, 2, c); rect(fx, x + 1, y - 1, 1, 2, c); }
+    rect(fx, x, y - 1, 1, 3, 'rgba(255,255,255,' + a + ')');
+  }
+  function drawProps(name, gx, fl) {
+    var a = girl.act, e = t - girl.since, f = girl.facing, i, p, x, y;
+    if (name === 'photo2') {                                  // the flash
+      x = gx + f * 16; y = fl - 39;
+      rect(fx, x - 3, y - 3, 7, 7, 'rgba(255,255,255,.3)'); rect(fx, x - 2, y, 5, 1, '#ffffff'); rect(fx, x, y - 2, 1, 5, '#ffffff');
+    }
+    if (name === 'chill3') {                                  // a little cloud of breath, drifting off and fading
+      p = (a.into(e) - 0.15) / 1.2;
+      if (p > 0 && p < 1) {
+        var c = 'rgba(236,244,255,' + (0.85 * (1 - p * p)).toFixed(2) + ')', r = p < 0.3 ? 1 : 2;
+        x = Math.round(gx + f * (9 + p * 8)); y = Math.round(fl - 40 - p * 5);
+        rect(fx, x - r + 1, y, 2 * r - 1, 1, c); rect(fx, x, y - r + 1, 1, 2 * r - 1, c);       // a soft little plus, growing
+        if (r > 1) { dot(fx, x - f * 3, y + 1, c); dot(fx, x + f * 2, y - 2, c); }             // wisps
+      }
+    }
+    if (/^music[234]/.test(name)) {                           // notes drifting up from the headphones
+      for (i = 0; i < 2; i++) {
+        p = mod(t / 1.6 + i / 2, 1);
+        x = gx - f * (9 + p * 6) + Math.sin(t * 3 + i * 2) * 1.2; y = fl - 46 - p * 14;
+        glyph(NOTE, Math.round(x) - 1, Math.round(y), rgba(i ? '#5ee6ff' : '#ff8fd0', fade(p)));
+      }
+    }
+    if (a.cat !== undefined && /^pet[234]/.test(name)) {      // a heart now and then from the happy cat
+      p = mod(e / 1.3, 1);
+      glyph(HEART, gx + f * 12 - 2, Math.round(fl - 23 - p * 10), rgba('#ff8fd0', Math.min(1, fade(p) * 1.6)));
+    }
+    if (a.fly) {                                              // the butterfly: in to her fingertip, a rest, then away
+      var tip = FLY_TIP[name] || FLY_TIP.fly3, tx = gx + f * tip[0], ty = fl + tip[1] - 2, flap = Math.floor(t * 12) % 2;
+      if (e < a.land) {
+        p = e / a.land; var q = 1 - (1 - p) * (1 - p);
+        drawBug(tx + f * (1 - q) * 46 + Math.sin(e * 5) * 4 * (1 - p), ty - (1 - q) * 30 + Math.sin(e * 9) * 3 * (1 - p), '#5ee6ff', flap, Math.min(1, p * 5));
+      } else if (e < a.off) {
+        drawBug(tx, ty, '#5ee6ff', mod(e - a.land, 1.4) < 0.9, 1);   // resting: wings open, now and then a slow close
+      } else if ((p = (e - a.off) / 1.8) < 1) {
+        drawBug(tx + f * p * 24 + Math.sin(e * 6) * 3, ty - p * 44, '#5ee6ff', flap, p < 0.6 ? 1 : (1 - p) / 0.4);
+      }
+    }
+  }
   function drawFront(dt) {
     fx.imageSmoothingEnabled = false;
     fx.clearRect(0, 0, front.width, front.height);
@@ -1199,6 +1341,7 @@
       var img = GIRL[name][girl.facing > 0 ? 0 : 1];
       fx.drawImage(img, Math.round(girl.x) - (G.AX + 1), fl - img.height + 2 - lift);
       if (ASLEEP[name]) drawZzz(girl.x, fl + 2 - G.poses[name].rows.length, girl.facing);
+      if (girl.mode === 'act') drawProps(name, Math.round(girl.x), fl - lift);
     }
     if (bubble) {
       if (t < bubbleUntil) {
