@@ -328,6 +328,7 @@
     { g: 'Filter projects', icon: 'message-text', label: 'LLM & agent projects', run: filterTo('llm') },
     { g: 'Filter projects', icon: 'eye', label: 'Computer vision projects', run: filterTo('vision') },
     { g: 'Filter projects', icon: 'git-branch', label: 'Research projects', run: filterTo('research') },
+    { g: 'Actions', icon: 'file-alt', label: 'Plain version', run: function () { location.href = 'index.html'; } },
     { g: 'Actions', icon: 'moon', label: 'Switch dusk / night', hint: 'T', run: toggleTheme },
     { g: 'Actions', icon: 'volume-3', label: 'Toggle sound', run: toggleSound },
     { g: 'Actions', icon: 'arrow-up', label: 'Jump!', hint: 'W', run: function () { World.jump(); } },

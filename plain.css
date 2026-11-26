@@ -1,0 +1,154 @@
+/* Plain version of the site: one dark column, text first. The pixel city lives in world.html / style.css. */
+
+:root {
+  --bg: #0d0d10;
+  --text: #d6d6dc;
+  --strong: #f2f2f5;
+  --muted: #8b8b96;
+  --rule: #24242b;
+  --accent: #8fb4ff;
+  --glow: #c79bff;            /* the switch's highlight, a nod to the city's violet */
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.65 var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 2px; }
+b { color: var(--strong); font-weight: 600; }
+
+.page { max-width: 680px; margin: 0 auto; padding: 0 16px; }
+main.page { padding-top: 88px; }
+
+/* ---------- header ---------- */
+.intro h1 { margin: 0; color: var(--strong); font-size: 1.9rem; font-weight: 650; letter-spacing: -.01em; line-height: 1.2; }
+.intro__role { margin: .35rem 0 0; font-size: 1.05rem; color: var(--text); }
+.intro__meta { margin: .2rem 0 0; color: var(--muted); font-size: .95rem; }
+.open { color: #7fd9a0; }
+.links { display: flex; flex-wrap: wrap; gap: .35rem 1.25rem; margin-top: 1rem; font-size: .95rem; }
+
+/* ---------- sections ---------- */
+section { margin-top: 3rem; scroll-margin-top: 24px; }
+h2 {
+  margin: 0 0 1rem; padding-bottom: .4rem; border-bottom: 1px solid var(--rule);
+  color: var(--muted); font: 600 .75rem/1.4 var(--mono); letter-spacing: .12em; text-transform: uppercase;
+}
+p { margin: 0 0 .75rem; }
+.muted { color: var(--muted); }
+
+.entry { margin-bottom: 1.75rem; }
+.entry:last-child { margin-bottom: 0; }
+.entry h3 { margin: 0 0 .25rem; color: var(--strong); font-size: 1rem; font-weight: 600; line-height: 1.45; }
+.entry__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 1rem; }
+.entry__date { color: var(--muted); font: .8rem var(--mono); white-space: nowrap; }
+.entry__sub { margin: 0 0 .5rem; color: var(--muted); font-size: .92rem; }
+.entry p:not(.entry__sub) { font-size: .95rem; }
+.stack { color: var(--muted); font: .78rem/1.6 var(--mono); margin-bottom: .35rem; }
+.more, .actions { font-size: .9rem; }
+.actions { display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; align-items: baseline; }
+.linkish { padding: 0; border: 0; background: none; color: var(--accent); font: inherit; cursor: pointer; }
+.linkish:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+.rows { margin: 0; }
+.rows > div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 1rem; padding: .3rem 0; font-size: .95rem; }
+.rows dt { color: var(--muted); font: .8rem/1.9 var(--mono); }
+.rows dd { margin: 0; }
+.plain-list { margin: 1rem 0 0; padding-left: 1.1rem; font-size: .95rem; }
+.plain-list li { margin-bottom: .35rem; }
+
+.footer { margin-top: 4rem; padding-top: 1.25rem; padding-bottom: 3rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .85rem; }
+.footer p { margin: 0; }
+
+/* ---------- the switch to the pixel city ----------
+   Glows and pulses three times on every page load (no stored state), then settles. */
+.mode-switch {
+  position: fixed; top: 16px; right: 16px; z-index: 10;
+  display: block;             /* the link's box is just the icon; the hint floats beside it */
+  color: var(--glow); text-decoration: none;
+}
+.mode-switch:hover { text-decoration: none; }
+.mode-switch__icon {
+  display: block; width: 44px; height: 44px; padding: 9px;
+  border: 1px solid #3d3352; border-radius: 10px; background: #16131d;
+  animation: switch-pulse 1.3s ease-in-out .6s 3;
+  transition: border-color .2s, transform .2s;
+}
+.mode-switch:hover .mode-switch__icon { border-color: var(--glow); transform: translateY(-1px); }
+.mode-switch:focus-visible { outline: none; }
+.mode-switch:focus-visible .mode-switch__icon { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.mode-switch__hint {
+  position: absolute; top: 50%; right: calc(100% + .6rem); translate: 0 -50%;
+  padding: .3rem .65rem; border: 1px solid #3d3352; border-radius: 6px; background: #16131d;
+  color: var(--text); font: .78rem/1.4 var(--mono); white-space: nowrap;
+  opacity: 0; pointer-events: none;
+  animation: switch-hint 4.4s ease .6s forwards;
+}
+.mode-switch:hover .mode-switch__hint,
+.mode-switch:focus-visible .mode-switch__hint { opacity: 1 !important; }   /* !important beats the animation without restarting it */
+
+@keyframes switch-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(199, 155, 255, 0); border-color: #3d3352; }
+  50% { transform: scale(1.08); box-shadow: 0 0 0 6px rgba(199, 155, 255, .16), 0 0 24px 4px rgba(199, 155, 255, .45); border-color: var(--glow); }
+}
+@keyframes switch-hint {
+  0% { opacity: 0; transform: translateX(8px); }
+  10%, 82% { opacity: 1; transform: none; }
+  100% { opacity: 0; transform: none; }
+}
+
+@keyframes switch-hint-still { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .mode-switch__icon { animation: none; border-color: var(--glow); box-shadow: 0 0 0 3px rgba(199, 155, 255, .25); }
+  .mode-switch__hint { animation: switch-hint-still 5s step-end forwards; }   /* shown, then simply gone: no movement */
+}
+
+@media (max-width: 560px) {
+  .intro h1 { font-size: 1.6rem; }
+  .rows > div { grid-template-columns: 1fr; gap: 0; padding: .45rem 0; }
+}
+
+/* ---------- wide screens: dashboard layout ----------
+   Intro + about pinned on the left, everything else on the right; entries become cards. */
+@media (min-width: 1100px) {
+  .page { max-width: 1480px; padding: 0 56px; }
+  main.page {
+    display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 72px; align-items: start;
+    padding-top: 96px;
+  }
+  .side #about { margin-top: 2.25rem; }
+  .side #about p { font-size: .95rem; }
+  .content > section:first-child { margin-top: 0; }
+
+  .grid-2 { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .content .entry {
+    display: flex; flex-direction: column;
+    margin: 0 0 16px; padding: 1.15rem 1.25rem 1.05rem;
+    border: 1px solid var(--rule); border-radius: 10px; background: #111115;
+    transition: border-color .2s;
+  }
+  .content .entry:hover { border-color: #34343e; }
+  .grid-2 .entry { margin: 0; }
+  .content .entry .more, .content .entry .actions { margin-top: auto; padding-top: .25rem; }
+  .content .entry .actions { margin-bottom: 0; }
+}
+/* two cards per row only once each card can be at least ~360px wide */
+@media (min-width: 1280px) {
+  .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 1100px) and (min-height: 700px) {
+  .side { position: sticky; top: 96px; }
+}

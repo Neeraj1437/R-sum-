@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="day">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neeraj Rajiv Shivam · AI/ML Engineer</title>
+  <meta name="description" content="Neeraj Rajiv Shivam: final-year B.Tech CSE (AI & ML) student at RV University, Bengaluru. Builds LLM systems end to end: LoRA fine-tuning and evals, agents, Python backends, computer vision and edge AI.">
+  <meta name="theme-color" content="#170f33">
+  <meta property="og:title" content="Neeraj Rajiv Shivam · AI/ML Engineer">
+  <meta property="og:description" content="LLM systems end to end: LoRA fine-tuning and evals, agents, Python backends, computer vision and edge AI.">
+  <link rel="icon" type="image/png" href="images/favicon.png">
+  <link rel="apple-touch-icon" href="images/favicon.png">
+
+  <script>
+    // Pick dusk/night before first paint: saved choice, else the visitor's local time.
+    (function () {
+      var t = null;
+      try { t = localStorage.getItem('world-theme'); } catch (e) {}
+      if (t !== 'day' && t !== 'night') {
+        var h = new Date().getHours();
+        t = (h >= 6 && h < 19) ? 'day' : 'night';
+      }
+      document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Nunito:wght@400;600;700;800&family=Pixelify+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- The world: sky and skyline (behind) and the rooftop, the girl, cats and robots (in front) -->
+  <canvas id="world-back" aria-hidden="true"></canvas>
+  <canvas id="world-front" aria-hidden="true"></canvas>
+  <div class="bubble" id="bubble" aria-hidden="true"></div>
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="hud" id="hud">
+    <div class="hud__inner">
+      <a href="#home" class="hud__player" aria-label="Back to top">
+        <span class="portrait portrait--hud" aria-hidden="true"><span class="avatar" data-avatar></span></span>
+        <span class="hud__name">Neeraj</span>
+      </a>
+
+      <div class="hud__xp" title="Sections explored">
+        <span class="hud__xp-label">XP</span>
+        <div class="xpbar"><span id="xp-fill"></span></div>
+        <span class="hud__xp-count" id="xp-count">0/7</span>
+      </div>
+
+      <nav class="nav" id="nav" aria-label="Primary">
+        <a href="#about" class="nav__link">About</a>
+        <a href="#experience" class="nav__link">Experience</a>
+        <a href="#projects" class="nav__link">Projects</a>
+        <a href="#publication" class="nav__link">Publication</a>
+        <a href="#skills" class="nav__link">Skills</a>
+        <a href="#education" class="nav__link">Education</a>
+        <a href="#contact" class="nav__link">Contact</a>
+      </nav>
+
+      <div class="hud__actions">
+        <a class="hud-btn" href="index.html" id="plain-link" aria-label="Plain version" title="Plain version"><i class="pi" data-pi="file-alt"></i></a>
+        <button class="hud-btn" id="palette-open" aria-label="Open quick menu (Ctrl + K)" title="Quick menu (Ctrl + K)"><i class="pi" data-pi="search"></i></button>
+        <button class="hud-btn" id="sound-toggle" aria-label="Turn sound on" aria-pressed="false" title="Sound"><i class="pi" data-pi="volume-x"></i></button>
+        <button class="hud-btn" id="theme-toggle" aria-label="Switch between dusk and night" title="Dusk / night">
+          <i class="pi only-day" data-pi="moon"></i><i class="pi only-night" data-pi="sun"></i>
+        </button>
+        <button class="hud-btn menu-btn" id="menu-toggle" aria-label="Open navigation" aria-expanded="false" aria-controls="nav"><i class="pi" data-pi="menu"></i></button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="home">
+      <div class="wrap">
+        <h1 class="hero__title">Neeraj Rajiv Shivam</h1>
+
+        <div class="dialog panel">
+          <div class="dialog__name">Neeraj</div>
+          <p class="dialog__role"><span class="caret-l">▶</span> Hi there! Get to know me here.</p>
+          <p class="dialog__text">
+            Pull up a bench: scroll to walk the rooftop past my projects, my skills and the odd vending machine.
+            Final-year B.Tech CSE (AI &amp; ML) student at RV University, Bengaluru, graduating in 2027.
+          </p>
+          <div class="dialog__actions">
+            <a href="#about" class="btn btn--go">▶ Start exploring</a>
+            <a href="resume.pdf" class="btn btn--wood" download data-resume><i class="pi" data-pi="download"></i> Résumé</a>
+            <a href="https://github.com/Neeraj1437" class="btn btn--icon" target="_blank" rel="noopener" aria-label="GitHub"><i class="pi" data-pi="github"></i></a>
+            <a href="https://www.linkedin.com/in/neeraj-rajiv-shivam-71282a27a/" class="btn btn--icon" target="_blank" rel="noopener" aria-label="LinkedIn"><span class="li">in</span></a>
+            <button class="btn btn--icon" data-copy="neerajrs1437@gmail.com" aria-label="Copy email address"><i class="pi" data-pi="mail"></i></button>
+          </div>
+          <span class="dialog__more" aria-hidden="true">▼</span>
+        </div>
+
+        <p class="controls">
+          <span>Scroll to walk</span>
+          <span class="controls__keys"><kbd>A</kbd><kbd>D</kbd> move · <kbd>W</kbd> jump</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section class="section" id="about">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">About me</h2>
+        </header>
+
+        <div class="about">
+          <aside class="panel profile reveal" aria-label="Profile">
+            <div class="profile__head">
+              <div class="portrait portrait--card" role="img" aria-label="Pixel portrait of Neeraj"><span class="avatar" data-avatar></span></div>
+              <div class="profile__intro">
+                <p class="profile__tag">Player card</p>
+                <p class="profile__status"><span class="dot" aria-hidden="true"></span>Open to work</p>
+              </div>
+            </div>
+            <h3 class="profile__name">Neeraj Rajiv Shivam</h3>
+            <p class="profile__role">AI/ML engineer · LLM systems</p>
+
+            <dl class="profile__list">
+              <div><dt>University</dt><dd>RV University</dd></div>
+              <div><dt>Degree</dt><dd>B.Tech CSE (AI &amp; ML)</dd></div>
+              <div><dt>CGPA</dt><dd>8.72 / 10</dd></div>
+              <div><dt>Graduating</dt><dd>2027</dd></div>
+              <div><dt>Based in</dt><dd>Bengaluru, India</dd></div>
+              <div><dt>Languages</dt><dd>English · Kannada · Hindi</dd></div>
+            </dl>
+
+            <div class="profile__links">
+              <a href="resume.pdf" class="btn btn--wood btn--sm" download data-resume><i class="pi" data-pi="download"></i> Résumé</a>
+              <a href="https://github.com/Neeraj1437" class="btn btn--icon" target="_blank" rel="noopener" aria-label="GitHub"><i class="pi" data-pi="github"></i></a>
+              <a href="https://www.linkedin.com/in/neeraj-rajiv-shivam-71282a27a/" class="btn btn--icon" target="_blank" rel="noopener" aria-label="LinkedIn"><span class="li">in</span></a>
+              <button class="btn btn--icon" data-copy="neerajrs1437@gmail.com" aria-label="Copy email address"><i class="pi" data-pi="mail"></i></button>
+            </div>
+          </aside>
+
+          <div class="panel reveal">
+            <p>
+              I'm a final-year B.Tech CSE (AI &amp; ML) student at RV University in Bengaluru, graduating in 2027.
+            </p>
+            <p>
+              I build LLM systems end to end: I fine-tune models, write the evaluations that show whether they actually got
+              better, and build the backend around them. I've also worked on computer vision and edge AI, including a wearable
+              that reads printed pages aloud for visually impaired users.
+            </p>
+
+            <h3 class="mini-title">What I work with</h3>
+            <ul class="perks">
+              <li><i class="pi" data-pi="message-text"></i>LLM fine-tuning (LoRA)</li>
+              <li><i class="pi" data-pi="check-double"></i>LLM evals</li>
+              <li><i class="pi" data-pi="android"></i>Agents (LangGraph)</li>
+              <li><i class="pi" data-pi="server"></i>Python backends</li>
+              <li><i class="pi" data-pi="eye"></i>Computer vision</li>
+              <li><i class="pi" data-pi="zap"></i>Edge AI</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EXPERIENCE ============ -->
+    <section class="section" id="experience">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">Experience</h2>
+        </header>
+
+        <article class="panel job reveal">
+          <div class="job__top">
+            <div>
+              <h3 class="job__role">IoT Intern · RVITM</h3>
+              <p class="job__date">Jun 2026 – Aug 2026</p>
+            </div>
+            <span class="badge badge--green">✓ Completed</span>
+          </div>
+          <h4 class="job__title">Helping Eyes: a wearable that reads pages aloud for visually impaired users</h4>
+          <p>
+            An ESP32-CAM on the wearable takes a photo of the page. The system finds the page in the photo, straightens and
+            cleans it up, reads the text with a vision-language model and speaks it, with no screen and no hands needed.
+          </p>
+
+          <ol class="chain" aria-label="Helping Eyes pipeline">
+            <li><i class="pi" data-pi="camera"></i><span>Capture</span><small>ESP32-CAM</small></li>
+            <li><i class="pi" data-pi="crop"></i><span>Detect</span><small>YOLOv8</small></li>
+            <li><i class="pi" data-pi="image-flash"></i><span>Enhance</span><small>OpenCV</small></li>
+            <li><i class="pi" data-pi="eye"></i><span>Read</span><small>Qwen3-VL</small></li>
+            <li><i class="pi" data-pi="volume-3"></i><span>Speak</span><small>TTS</small></li>
+          </ol>
+
+          <h4 class="mini-title">Key highlights</h4>
+          <ul class="checks">
+            <li><mark>98.26% character</mark> and <mark>91.06% word accuracy</mark> on blurry ESP32-CAM photos, by passing each photo through OpenCV, YOLOv8 and Qwen3-VL</li>
+            <li>EasyOCR managed only <mark>4.28%</mark> character accuracy on the same kind of photos</li>
+            <li>A full page goes from photo to speech in <mark>about 11 s</mark>, by chaining page detection, perspective correction, VLM text reading and text-to-speech</li>
+            <li>Designed the enclosure in <strong>Fusion 360</strong> and 3D-printed it, fitting the camera, battery, charging and audio into one <mark>hands-free</mark> prototype</li>
+          </ul>
+
+          <div class="versus reveal" aria-label="Character accuracy comparison">
+            <div class="versus__row">
+              <span class="versus__who">Helping Eyes</span>
+              <div class="bar bar--lg"><span class="bar__fill bar__fill--green" style="--w:98.26%"></span></div>
+              <span class="versus__val">98.26%</span>
+            </div>
+            <div class="versus__row">
+              <span class="versus__who">EasyOCR</span>
+              <div class="bar bar--lg"><span class="bar__fill bar__fill--red" style="--w:4.28%"></span></div>
+              <span class="versus__val">4.28%</span>
+            </div>
+          </div>
+
+          <div class="items">
+            <span>ESP32-CAM</span><span>OpenCV</span><span>YOLOv8</span><span>Qwen3-VL</span><span>Text-to-speech</span><span>Fusion 360</span><span>3D printing</span>
+          </div>
+          <a class="text-link" href="https://github.com/Neeraj1437/Helping_Eyes" target="_blank" rel="noopener">View repository ▶</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section class="section" id="projects">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">Projects</h2>
+        </header>
+
+        <div class="tabs reveal" role="tablist" aria-label="Filter projects">
+          <button class="tab is-active" data-filter="all" role="tab" aria-selected="true">All</button>
+          <button class="tab" data-filter="llm" role="tab" aria-selected="false">LLMs &amp; agents</button>
+          <button class="tab" data-filter="vision" role="tab" aria-selected="false">Computer vision</button>
+          <button class="tab" data-filter="research" role="tab" aria-selected="false">Research</button>
+        </div>
+
+        <div class="cards">
+          <article class="panel card card--star reveal" data-tags="llm">
+            <div class="card__top">
+              <span class="card__icon"><i class="pi" data-pi="briefcase-search"></i></span>
+              <span class="badge">LLM · Backend</span>
+            </div>
+            <h3 class="card__title">JobPipe: AI Job-Search and Application Tool</h3>
+            <p class="card__sum">Pulls openings from about 90 company job boards into one ranked shortlist, then helps fill in the applications.</p>
+            <ul class="checks">
+              <li>Listings come in from the <mark>Greenhouse, Lever, Ashby and SmartRecruiters</mark> APIs</li>
+              <li>Stored in a SQLite database I designed: <mark>6 tables, 9 schema migrations</mark></li>
+              <li>Filtered with SQL, then each job is <mark>scored against my résumé</mark> to rank the shortlist</li>
+              <li>A JSON API with <mark>30 routes</mark> in Python gives a dashboard and a browser extension one backend to talk to</li>
+              <li>Drafts application-form answers with an LLM in a <mark>fixed JSON shape</mark>, covered by <mark>357 pytest tests</mark></li>
+            </ul>
+            <div class="items"><span>Python</span><span>SQLite</span><span>SQL</span><span>JSON API</span><span>LLM structured output</span><span>pytest</span><span>Browser extension</span></div>
+          </article>
+
+          <article class="panel card reveal" data-tags="llm">
+            <div class="card__top">
+              <span class="card__icon"><i class="pi" data-pi="message-text"></i></span>
+              <span class="badge">LLM · Evals</span>
+            </div>
+            <h3 class="card__title">LLM Fine-Tuning and Evals for Support-Ticket Triage</h3>
+            <p class="card__sum">Qwen2.5-3B-Instruct fine-tuned with LoRA to turn fintech support tickets into structured JSON.</p>
+            <div class="versus versus--sm reveal" aria-label="Dev exact-match before and after fine-tuning">
+              <div class="versus__row">
+                <span class="versus__who">Base (prompted)</span>
+                <div class="bar"><span class="bar__fill bar__fill--red" style="--w:23.5%"></span></div>
+                <span class="versus__val">23.5%</span>
+              </div>
+              <div class="versus__row">
+                <span class="versus__who">LoRA fine-tune</span>
+                <div class="bar"><span class="bar__fill bar__fill--green" style="--w:94%"></span></div>
+                <span class="versus__val">94.0%</span>
+              </div>
+            </div>
+            <ul class="checks">
+              <li><mark>98.8% field accuracy</mark> and <mark>100% valid JSON</mark> on the dev set</li>
+              <li>LoRA r=16 (29.9M trainable params) in a hand-written PyTorch training loop</li>
+              <li>Wrote the evaluation myself (exact match, per-field accuracy, JSON validity); the gain <mark>held across reruns</mark> under a paired McNemar test</li>
+              <li>Cleaned the training set from 1,445 to 1,262 rows: truncated labels, duplicates and dev-set leakage</li>
+            </ul>
+            <div class="items"><span>LoRA</span><span>PyTorch</span><span>Qwen2.5</span><span>Hugging Face</span><span>LLM evals</span></div>
+            <a class="text-link" href="https://github.com/Neeraj1437/vima3ya-nimbuspay-ticket-triage-lora" target="_blank" rel="noopener">Repository ▶</a>
+          </article>
+
+          <article class="panel card reveal" data-tags="llm vision">
+            <div class="card__top">
+              <span class="card__icon"><i class="pi" data-pi="shopping-bag"></i></span>
+              <span class="badge">Team of 4 · CV lead</span>
+            </div>
+            <h3 class="card__title">ReturnGuard: AI Agent that Checks Clothing Returns</h3>
+            <p class="card__sum">A LangGraph agent that looks at a customer's photos and decides whether a clothing return holds up. I led the computer-vision side.</p>
+            <ul class="checks">
+              <li>Fine-tuned <mark>two YOLO11 models</mark> as the agent's tools: one says if clothes are damaged, the other marks where</li>
+              <li>Damage evidence at <mark>90.7% accuracy, 96.4% recall</mark>; 81.9% on 199 real Amazon photos</li>
+              <li>Caught <mark>all 6 wrong-item photos</mark> in a test on real Amazon orders</li>
+              <li>Compares CLIP image embeddings of the customer's photo with the catalog photos, plus a Gemini check of the item's type and colour</li>
+            </ul>
+            <div class="items"><span>LangGraph</span><span>YOLO11</span><span>CLIP</span><span>Gemini</span><span>PyTorch</span></div>
+            <a class="text-link" href="https://github.com/Nidhicoconut/returnguard" target="_blank" rel="noopener">Team repository ▶</a>
+          </article>
+
+          <article class="panel card reveal" data-tags="llm vision">
+            <div class="card__top">
+              <span class="card__icon"><i class="pi" data-pi="radio-tower"></i></span>
+              <span class="badge">VLM · Edge</span>
+            </div>
+            <h3 class="card__title">LLM-Based Vehicle Navigation with RSU-Assisted Edge Computing</h3>
+            <p class="card__sum">A roadside unit runs a small vision-language model and gives drivers spoken warnings about the road ahead.</p>
+            <ul class="checks">
+              <li>Taught <mark>SmolVLM-500M</mark> to describe traffic scenes with LoRA (r=8) for 4 epochs</li>
+              <li>Built the training data by translating a Vietnamese traffic-caption dataset into English with <mark>NLLB-200</mark></li>
+              <li>The <mark>4-bit model</mark> runs on the roadside unit and combines what several cars can see</li>
+              <li>A Raspberry Pi 5 simulates a car that talks to the RSU over <mark>MQTT</mark></li>
+            </ul>
+            <div class="items"><span>SmolVLM</span><span>LoRA</span><span>NLLB-200</span><span>4-bit quantization</span><span>Raspberry Pi 5</span><span>MQTT</span></div>
+            <a class="text-link" href="https://github.com/Neeraj1437/MultiModalNavigation" target="_blank" rel="noopener">Repository ▶</a>
+          </article>
+
+          <article class="panel card reveal" data-tags="vision research">
+            <div class="card__top">
+              <span class="card__icon"><i class="pi" data-pi="heart"></i></span>
+              <span class="badge badge--gold">Accepted · IEEE</span>
+            </div>
+            <h3 class="card__title">CNN-Filtered GANs for Imbalanced Chest X-Ray Augmentation</h3>
+            <p class="card__sum">Balancing a lopsided pneumonia X-ray dataset with generated images that are worth training on.</p>
+            <ul class="checks">
+              <li>A CNN <mark>throws out low-confidence X-rays</mark> before GAN training</li>
+              <li>Compared <mark>4 GANs</mark>: cDCGAN, AE-GAN, VAE-GAN and CycleGAN</li>
+              <li>Checked the results with a ResNet-18 classifier plus <mark>Grad-CAM and LIME</mark> explanations</li>
+            </ul>
+            <div class="items"><span>GANs</span><span>CycleGAN</span><span>ResNet-18</span><span>Grad-CAM</span><span>LIME</span><span>PyTorch</span></div>
+            <a class="text-link" href="https://github.com/Neeraj1437/cnn-filtered-gan" target="_blank" rel="noopener">Repository ▶</a>
+          </article>
+
+          <article class="panel card reveal" data-tags="research">
+            <div class="card__top">
+              <span class="card__icon"><i class="pi" data-pi="git-branch"></i></span>
+              <span class="badge">Research</span>
+            </div>
+            <h3 class="card__title">Sparse Sub-Networks with Edge-Popup, LTH and Active Learning</h3>
+            <p class="card__sum">Can a randomly picked sparse network inside a bigger one learn as well from less labelled data?</p>
+            <ul class="checks">
+              <li><mark>Matched a full LeNet-5</mark> on CIFAR-10 while using <mark>less labelled data</mark></li>
+              <li>Found the sub-networks with Edge-Popup and the Lottery Ticket Hypothesis</li>
+              <li>Least-confidence active learning picked which images to label next</li>
+            </ul>
+            <div class="items"><span>Pruning</span><span>Active learning</span><span>CNNs</span><span>CIFAR-10</span><span>PyTorch</span></div>
+            <a class="text-link" href="https://github.com/Neeraj1437/edge-lottery-al" target="_blank" rel="noopener">Repository ▶</a>
+          </article>
+        </div>
+        <p class="empty" id="empty-state" hidden>No projects in this category yet.</p>
+      </div>
+    </section>
+
+    <!-- ============ PUBLICATION ============ -->
+    <section class="section" id="publication">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">Publication</h2>
+        </header>
+
+        <article class="panel paper reveal">
+          <div class="paper__item" aria-hidden="true"><i class="pi" data-pi="script-text"></i></div>
+          <div>
+            <span class="badge badge--blue">ICT4SD 2025 · Springer LNNS vol. 1652</span>
+            <h3 class="paper__title">Accident Detection and Emergency Support System for Scooters Based on Edge AI Technology</h3>
+            <p class="paper__authors">Tanmay, M.S., <strong>Shivam, N.R.</strong>, Shivanna, V., Sathya, D., Sankaran, C.</p>
+            <ul class="checks">
+              <li>An ESP32 with an <mark>MPU6050 and GPS</mark> runs a small quantized neural network on the scooter itself</li>
+              <li>Tells crashes and falls apart from normal riding with <mark>98% accuracy</mark></li>
+              <li>Then alerts emergency contacts with the rider's <mark>location and blood group</mark></li>
+            </ul>
+            <div class="paper__actions">
+              <a class="btn btn--go" href="https://doi.org/10.1007/978-3-032-06691-6_25" target="_blank" rel="noopener">Read paper</a>
+              <button class="btn btn--wood" id="copy-bibtex">Copy BibTeX</button>
+            </div>
+            <p class="paper__doi">DOI: 10.1007/978-3-032-06691-6_25</p>
+            <p class="paper__also"><span class="badge badge--gold">Accepted · IEEE</span> CNN-Filtered GANs for Imbalanced Chest X-Ray Augmentation <a href="#projects" class="text-link text-link--inline" data-filter-link="research">see project</a></p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ============ SKILLS ============ -->
+    <section class="section" id="skills">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">Skills</h2>
+        </header>
+
+        <div class="bags">
+          <div class="panel bag reveal">
+            <h3 class="bag__title"><i class="pi" data-pi="message-text"></i> LLMs &amp; agents</h3>
+            <div class="slots"><span>LoRA fine-tuning</span><span>LLM evals</span><span>Structured JSON output</span><span>LangGraph</span><span>Claude</span><span>Gemini</span><span>Qwen</span><span>Ollama</span></div>
+          </div>
+          <div class="panel bag reveal">
+            <h3 class="bag__title"><i class="pi" data-pi="server"></i> Backend &amp; data</h3>
+            <div class="slots"><span>Python</span><span>SQLite</span><span>SQL</span><span>JSON APIs</span><span>pytest</span><span>Git</span></div>
+          </div>
+          <div class="panel bag reveal">
+            <h3 class="bag__title"><i class="pi" data-pi="eye"></i> ML &amp; vision</h3>
+            <div class="slots"><span>PyTorch</span><span>HF Transformers</span><span>scikit-learn</span><span>OpenCV</span><span>YOLO11</span><span>CLIP embeddings</span><span>TensorFlow</span></div>
+          </div>
+          <div class="panel bag reveal">
+            <h3 class="bag__title"><i class="pi" data-pi="zap"></i> Edge &amp; embedded</h3>
+            <div class="slots"><span>C++</span><span>C</span><span>ESP32</span><span>Raspberry Pi</span><span>TinyML</span><span>Quantization</span><span>MQTT</span></div>
+          </div>
+          <div class="panel bag reveal">
+            <h3 class="bag__title"><i class="pi" data-pi="frame"></i> Design</h3>
+            <div class="slots"><span>Fusion 360</span><span>3D printing</span><span>Enclosure design</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ EDUCATION + ACHIEVEMENTS ============ -->
+    <section class="section" id="education">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">Education &amp; Achievements</h2>
+        </header>
+
+        <div class="journey">
+          <div class="panel reveal">
+            <h3 class="mini-title mini-title--top">Education</h3>
+            <ol class="map">
+              <li class="map__stop map__stop--now">
+                <span class="map__flag"><i class="pi" data-pi="flag"></i></span>
+                <div>
+                  <span class="map__when">2023 – 2027</span>
+                  <h4>RV University, Bengaluru</h4>
+                  <p>B.Tech (Hons.) in Computer Science, Artificial Intelligence &amp; Machine Learning</p>
+                  <span class="chip">CGPA 8.72 / 10</span>
+                </div>
+              </li>
+              <li class="map__stop">
+                <span class="map__flag"><i class="pi" data-pi="check"></i></span>
+                <div>
+                  <span class="map__when">2022</span>
+                  <h4>Venkat International Public School, Bengaluru</h4>
+                  <p>CBSE Class XII (PCMC)</p>
+                  <span class="chip">91%</span>
+                </div>
+              </li>
+              <li class="map__stop">
+                <span class="map__flag"><i class="pi" data-pi="check"></i></span>
+                <div>
+                  <span class="map__when">2020</span>
+                  <h4>Venkat International Public School, Bengaluru</h4>
+                  <p>CBSE Class X</p>
+                  <span class="chip">87%</span>
+                </div>
+              </li>
+            </ol>
+          </div>
+
+          <div class="panel reveal">
+            <h3 class="mini-title mini-title--top">Achievements</h3>
+            <ul class="ach">
+              <li>
+                <span class="ach__icon ach__icon--gold"><i class="pi" data-pi="trophy"></i></span>
+                <div><b>Rank 31 of 48.8K participants</b><span>HackerEarth Machine Learning Challenge (World Water Day)</span></div>
+              </li>
+              <li>
+                <span class="ach__icon"><i class="pi" data-pi="script-text"></i></span>
+                <div><b>Published with Springer</b><span>ICT4SD 2025, Lecture Notes in Networks and Systems, vol. 1652</span></div>
+              </li>
+              <li>
+                <span class="ach__icon"><i class="pi" data-pi="heart"></i></span>
+                <div><b>Paper accepted at IEEE</b><span>CNN-Filtered GANs for Imbalanced Chest X-Ray Augmentation</span></div>
+              </li>
+            </ul>
+
+            <h3 class="mini-title">Certifications</h3>
+            <p class="ach__sub">Machine Learning Specialization · DeepLearning.AI &amp; Stanford (Coursera)</p>
+            <ul class="scores">
+              <li><span>Supervised ML: Regression &amp; Classification</span><b>100 / 100</b></li>
+              <li><span>Advanced Learning Algorithms</span><b>99.73 / 100</b></li>
+              <li><span>Unsupervised Learning, Recommenders, Reinforcement Learning</span><b>100 / 100</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section class="section" id="contact">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h2 class="sign">Contact</h2>
+        </header>
+
+        <div class="panel mailbox reveal">
+          <div class="mailbox__text">
+            <p>
+              I'm looking for <mark>AI/ML engineering roles, internships and research collaborations</mark>, especially
+              work on LLM systems, fine-tuning and evals, agents, computer vision or edge AI. Say hello!
+            </p>
+            <ul class="contacts">
+              <li>
+                <i class="pi" data-pi="mail"></i>
+                <a href="mailto:neerajrs1437@gmail.com">neerajrs1437@gmail.com</a>
+                <button class="copy-btn" data-copy="neerajrs1437@gmail.com" aria-label="Copy personal email"><i class="pi" data-pi="copy"></i></button>
+              </li>
+              <li>
+                <i class="pi" data-pi="building"></i>
+                <a href="mailto:neerajr.btech23@rvu.edu.in">neerajr.btech23@rvu.edu.in</a>
+                <button class="copy-btn" data-copy="neerajr.btech23@rvu.edu.in" aria-label="Copy university email"><i class="pi" data-pi="copy"></i></button>
+              </li>
+              <li>
+                <span class="li li--sm">in</span>
+                <a href="https://www.linkedin.com/in/neeraj-rajiv-shivam-71282a27a/" target="_blank" rel="noopener">linkedin.com/in/neeraj-rajiv-shivam</a>
+              </li>
+              <li>
+                <i class="pi" data-pi="github"></i>
+                <a href="https://github.com/Neeraj1437" target="_blank" rel="noopener">github.com/Neeraj1437</a>
+              </li>
+            </ul>
+          </div>
+
+          <form class="letter" id="contact-form" novalidate>
+            <label for="f-name">Your name</label>
+            <input id="f-name" name="name" type="text" placeholder="Your name" required autocomplete="name">
+            <label for="f-subject">Subject</label>
+            <input id="f-subject" name="subject" type="text" placeholder="Internship, collaboration…" required>
+            <label for="f-msg">Message</label>
+            <textarea id="f-msg" name="message" rows="5" placeholder="Tell me a bit about it" required></textarea>
+            <button type="submit" class="btn btn--go">Send message ✉</button>
+            <p class="letter__note">Opens your email app with the message filled in.</p>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p class="footer__thanks">Thanks for visiting!</p>
+      <p>© <span id="year"></span> Neeraj Rajiv Shivam</p>
+      <p class="footer__keys"><kbd>A</kbd>/<kbd>D</kbd> walk · <kbd>W</kbd> jump · <kbd>T</kbd> dusk/night · <kbd>Ctrl</kbd>+<kbd>K</kbd> quick menu</p>
+    </div>
+  </footer>
+
+  <button class="to-top btn btn--icon" id="to-top" aria-label="Back to top"><i class="pi" data-pi="arrow-up"></i></button>
+
+  <!-- Quick menu (command palette) -->
+  <div class="palette" id="palette" hidden>
+    <div class="palette__backdrop" data-close></div>
+    <div class="palette__panel panel" role="dialog" aria-modal="true" aria-label="Quick menu">
+      <div class="palette__head">Quick menu</div>
+      <div class="palette__search">
+        <span aria-hidden="true">▶</span>
+        <input id="palette-input" type="text" placeholder="Where to?" autocomplete="off" spellcheck="false" aria-controls="palette-list">
+        <kbd>Esc</kbd>
+      </div>
+      <ul class="palette__list" id="palette-list" role="listbox"></ul>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="girl.js"></script>
+  <script src="world.js"></script>
+  <script src="avatar.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

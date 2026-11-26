@@ -6,9 +6,15 @@ Personal portfolio site: LLM systems end to end (LoRA fine-tuning and evals, age
 
 Plain HTML, CSS and JavaScript with no build step, so it can be served directly by GitHub Pages.
 
+The site has two versions. The live link always opens the **plain version** (`index.html`): a dark, text-first page in the style of a researcher's homepage. A glowing gamepad icon in its top-right corner (it pulses for a few seconds on every visit) leads to the **interactive version** (`world.html`), the pixel city below, which has a page icon in its top bar to come back.
+
+The content is written in both pages, so when you change it (a new project, say), update `index.html` and `world.html`.
+
 | File | What it holds |
 | --- | --- |
-| `index.html` | All content (edit text here) |
+| `index.html` | The plain version: all content as one dark text column, plus the switch to the city |
+| `plain.css` | Styles for the plain version, including the switch's glow on each visit (a steady ring instead when reduced motion is on) |
+| `world.html` | The interactive version: all content inside the pixel city |
 | `style.css` | Pixel UI: violet dusk/night colour tokens, neon panels, lit-sign headings, the About player card and portrait, buttons |
 | `girl.js` | The pink-haired player character as pixel frames (one character per pixel), traced from five sprite sheets: front, three-quarter, side and back poses, 6-frame walk and run cycles, jump (crouch, rise, tuck, fall, land), waving, relaxed standing poses, a calm smile, a stretch and yawn, turning round to face you, sitting down / leaning back / hugging her knees / getting up, nodding off on the floor, typing at a kiosk, taking a photo, headphones on, hands in pockets on a cold night, checking her phone, a vending-machine drink, petting a cat and a butterfly landing on her finger, plus breathing, blink, key-tap, nod and stroke frames |
 | `world.js` | The violet neon city on two canvases: cloud bands, a far skyline with a domed tower, dense lit buildings with water towers, fire escapes and a few pink neon word signs, kept sparse and dimmed behind the text column so the page stays easy to read, an elevated train, a turning wall fan, the rooftop with AC units, CRTs and a vending machine, the home desk with a fish tank and a terminal, kiosks, black and orange cats, critters. Also runs her free-roaming behaviour (strolls, sprints, looks around, turns to watch the sky, waves, strikes a relaxed pose, smiles to herself, stretches and yawns, turns round to look at you, walks over to the rooftop benches to sit for a while, sits down on the floor to nod off, with little z's, checks her phone, snaps a photo of the skyline with a flash, puts her headphones on and nods along with music notes, stands with her hands in her pockets breathing little clouds (mostly at night), holds up a finger for a holo-butterfly to land on, and walks over to type at a kiosk, pet a cat (it shuts its eyes and hearts float up) or get a drink from a vending machine). She only jumps when you press `W` or pick Jump! in the menu. `World.say(text, ms, mood)` shows a speech bubble; the optional mood (`'wave'`, `'notice'`, `'smile'`, `'gaze'`, `'look'`) makes her react as soon as she's free |
@@ -16,7 +22,7 @@ Plain HTML, CSS and JavaScript with no build step, so it can be served directly 
 | `script.js` | XP/discovery system, dusk/night, 8-bit sound, project filters, menu (command palette), contact form, and the fade that keeps text from running under the rooftop |
 | `resume.pdf` | Résumé linked from the "Résumé" button |
 
-Run locally: open `index.html`, or `python -m http.server` and visit http://localhost:8000.
+Run locally: open `index.html` (or `world.html` for the city), or `python -m http.server` and visit http://localhost:8000.
 
 Controls: scroll to walk · `A`/`D` walk · `W` jump · `T` dusk/night · `Ctrl/⌘ + K` or `/` menu. Leave her alone and she wanders off on her own.
 

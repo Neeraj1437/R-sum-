@@ -54,7 +54,12 @@
   }
   function mod(a, n) { return ((a % n) + n) % n; }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-  function canvas(w, h) { var c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h); return c; }
+  var sceneryWiped = false; // set when the browser hands back a cached canvas blank (see checkScenery)
+  function canvas(w, h) {
+    var c = document.createElement('canvas'); c.width = Math.max(1, w); c.height = Math.max(1, h);
+    c.addEventListener('contextrestored', function () { sceneryWiped = true; if (reduce) setTimeout(renderStatic, 0); });
+    return c;
+  }
   function rect(ctx, x, y, w, h, c) {
     ctx.fillStyle = c;
     ctx.fillRect(Math.round(x), Math.round(y), Math.max(1, Math.round(w)), Math.max(1, Math.round(h)));
@@ -214,9 +219,9 @@
     day: { // dusk: a violet city with lavender windows and pink neon
       sky: ['#3b2d93', '#4839a8', '#5343b5', '#7150bd'], stars: 0.45, moon: ['#f7f0ff', '#d6c8f2'],
       cloud: '#c4b0ff', cloudA: 0.17,
-      far: '#453392', farHi: '#54409f', farWin: ['#6d54bd', '#7b5dc6', '#6249b2'], farWinP: 0.22, haze: '#8f5ccc', tower: '#4d3a9e',
-      mid: '#3a2572', midHi: '#4b3389', midDark: '#2b1a58', midOff: '#311f63', midWin: ['#9d60d4', '#b67ce2', '#8b56c9'], midWinP: 0.26,
-      near: '#27164b', nearHi: '#3a2468', nearDark: '#1b0f36', edge: '#4f358c', nearOff: '#21133f', nearWin: ['#b571e3', '#cf92f2', '#a064d8'], nearWinP: 0.3,
+      far: '#453392', farHi: '#54409f', farWin: ['#6d54bd', '#7b5dc6', '#6249b2'], farWinP: 0.32, haze: '#8f5ccc', tower: '#4d3a9e',
+      mid: '#3a2572', midHi: '#4b3389', midDark: '#2b1a58', midOff: '#311f63', midWin: ['#9d60d4', '#b67ce2', '#8b56c9'], midWinP: 0.36,
+      near: '#27164b', nearHi: '#3a2468', nearDark: '#1b0f36', edge: '#4f358c', nearOff: '#21133f', nearWin: ['#b571e3', '#cf92f2', '#a064d8'], nearWinP: 0.4,
       crt: '#9484c6', screen: '#6a4fd8', screenHi: '#a68cf6', streak: '#ffb0e8', glow: 0.16,
       box: '#4a3a7e', boxHi: '#5f4d96', plant: ['#2f7a62', '#4fa982', '#7fd1a6'], water: '#7d8cf0', waterHi: '#b4c0ff', train: '#3b2775', trainHi: '#5b42a0',
       floor: '#45387e', floorHi: '#5d4e9a', floorDark: '#322865', face: '#22174a', faceDark: '#170f33', mote: '#ffffff'
@@ -224,9 +229,9 @@
     night: {
       sky: ['#0b0824', '#150f3a', '#221756', '#38206e'], stars: 1, moon: ['#fff6dc', '#d8cfae'],
       cloud: '#9a7cf0', cloudA: 0.11,
-      far: '#211750', farHi: '#2b1f60', farWin: ['#4d3896', '#5b41a6', '#44318c'], farWinP: 0.2, haze: '#5b3596', tower: '#281c5e',
-      mid: '#1b1140', midHi: '#281a56', midDark: '#120a2e', midOff: '#170e37', midWin: ['#a868e6', '#c98af2', '#9056d6'], midWinP: 0.24,
-      near: '#120a29', nearHi: '#1f1440', nearDark: '#0a0519', edge: '#34226a', nearOff: '#0f0823', nearWin: ['#cf86f4', '#e8a6f9', '#b06cea'], nearWinP: 0.28,
+      far: '#211750', farHi: '#2b1f60', farWin: ['#4d3896', '#5b41a6', '#44318c'], farWinP: 0.28, haze: '#5b3596', tower: '#281c5e',
+      mid: '#1b1140', midHi: '#281a56', midDark: '#120a2e', midOff: '#170e37', midWin: ['#a868e6', '#c98af2', '#9056d6'], midWinP: 0.32,
+      near: '#120a29', nearHi: '#1f1440', nearDark: '#0a0519', edge: '#34226a', nearOff: '#0f0823', nearWin: ['#cf86f4', '#e8a6f9', '#b06cea'], nearWinP: 0.36,
       crt: '#55497e', screen: '#5038c4', screenHi: '#7e66ea', streak: '#ff9ccc', glow: 0.24,
       box: '#2b2150', boxHi: '#3a2d66', plant: ['#174a3c', '#287058', '#3f9876'], water: '#4f5fd0', waterHi: '#8794f2', train: '#22164a', trainHi: '#3a2970',
       floor: '#45387e', floorHi: '#5d4e9a', floorDark: '#322865', face: '#22174a', faceDark: '#170f33', mote: '#ff9ccc'
@@ -458,8 +463,8 @@
       var w = Math.min(TILE - 2 - x, 22 + Math.floor(r() * 40)), h = Math.floor(50 + Math.pow(r(), 1.2) * maxH), top = yb - h;
       block(L, x, top, w, yb, rng(500 + x), T, false);
       var sr = r();
-      if (sr < 0.07 && w >= 20) signs.push(['h', x, top, w, flat[fi++ % flat.length]]);           // signs kept sparse, so the
-      else if (sr < 0.13 && h > 80) signs.push(['v', x, top, w, tall[ti++ % tall.length], r() < 0.4]);   // text stays the focus
+      if (sr < 0.13 && w >= 20) signs.push(['h', x, top, w, flat[fi++ % flat.length]]);           // signs kept sparse, so the
+      else if (sr < 0.26 && h > 80) signs.push(['v', x, top, w, tall[ti++ % tall.length], r() < 0.4]);   // text stays the focus
       tops.push([x, top, w]);
       x += w + (r() < 0.55 ? 0 : 2 + Math.floor(r() * 8));
     }
@@ -625,6 +630,26 @@
     near = genNear();
     groundTile = genGroundTile();
   }
+  // Chrome and Edge keep big canvases (the sky and city tiles) on the GPU. Under memory pressure, after a driver reset,
+  // or when a tab sits in the background, the browser can drop them and hand them back blank, which leaves an empty
+  // night sky. When that happens, draw the scenery again on fresh canvases.
+  function checkScenery() {
+    var gone = sceneryWiped;
+    [sky, far && far.c, mid && mid.c, near && near.c, groundTile].forEach(function (c) {
+      var x = c && c.getContext('2d');
+      if (x && x.isContextLost && x.isContextLost()) gone = true;
+    });
+    if (!gone) return false;
+    sceneryWiped = false;
+    buildScenery();
+    return true;
+  }
+  var nextCheck = 0;
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    nextCheck = 0;
+    if (reduce && WB) renderStatic();
+  });
 
   function resize() {
     var cw = document.documentElement.clientWidth || window.innerWidth;
@@ -822,7 +847,7 @@
   }
   function drawVeil() { // darkens the city behind the page's text column (about 1060 CSS px), fading out to the sides and the rooftop
     var col = Math.min(WB, Math.round(1060 / S)), edge = Math.round(140 / S), x0 = Math.round((WB - col) / 2), fb = floorB();
-    var a = night ? 0.42 : 0.36, c = night ? '10,6,30' : '24,14,64', k = edge / (col + 2 * edge);
+    var a = night ? 0.16 : 0.14, c = night ? '10,6,30' : '24,14,64', k = edge / (col + 2 * edge);
     var g = bx.createLinearGradient(x0 - edge, 0, x0 + col + edge, 0);
     g.addColorStop(0, 'rgba(' + c + ',0)'); g.addColorStop(k, 'rgba(' + c + ',' + a + ')');
     g.addColorStop(1 - k, 'rgba(' + c + ',' + a + ')'); g.addColorStop(1, 'rgba(' + c + ',0)');
@@ -1379,6 +1404,7 @@
     dt = Math.min(dt, 0.1);
     last = now;
     t += dt;
+    if (t >= nextCheck) { nextCheck = t + 1; checkScenery(); }
     update(dt);
     drawBack();
     drawFront(dt);
@@ -1386,6 +1412,7 @@
   }
 
   function renderStatic() { // reduced motion: redraw only when something changes
+    checkScenery();
     update(0);
     drawBack();
     drawFront(1);
